@@ -1,7 +1,8 @@
 require 'pp'
 require './digit_array'
-require './templates/arithmetic'
-require './proofs/arithmetic'
+
+Dir.glob('./templates/**.rb') {|f| require f}
+Dir.glob('./proofs/**.rb') {|f| require f}
 
 def test(solution_name, proposed_solution, tests)
   method = "def __#{solution_name}(a, b)\n" + 
