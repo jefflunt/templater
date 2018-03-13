@@ -30,16 +30,18 @@ end
 start_time = Time.now
 max_lines = 10
 
-Proofs::Arithmetic.proofs.each do |p|
-  tests = Proofs::Arithmetic.send(p)
-  digits = [nil, Templates::Arithmetic.methods - Module.methods].flatten
-  max = (digits.length**max_lines) - 1
+Proofs.constants.each do |c|
+  Proofs.const_get(c).proofs.each do |p|
+    tests = Proofs::Arithmetic.send(p)
+    digits = [nil, Templates::Arithmetic.methods - Module.methods].flatten
+    max = (digits.length**max_lines) - 1
 
-  solution_count = 0
-  (0..max).each do |i|
-    solution = DigitArray.convert(i, digits, max_lines).compact
-    solution_count += 1 if test(p.to_s.sub('prove_', ''), solution, tests)
-    break if solution_count >= 100
+    solution_count = 0
+    (0..max).each do |i|
+      solution = DigitArray.convert(i, digits, max_lines).compact
+      solution_count += 1 if test(p.to_s.sub('prove_', ''), solution, tests)
+      break if solution_count >= 100
+    end
   end
 end
 
