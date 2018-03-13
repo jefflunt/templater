@@ -1,12 +1,12 @@
 require 'pp'
 require './digit_array'
-require './arithmetic'
-require './prove_arithmetic'
+require './templates/arithmetic'
+require './proofs/arithmetic'
 
 def test(solution_name, proposed_solution, tests)
   method = "def __#{solution_name}(a, b)\n" + 
            proposed_solution.
-             collect{|t| "  #{Arithmetic.send(t)}" }.
+             collect{|t| "  #{Templates::Arithmetic.send(t)}" }.
              join("\n") +
            "\nend"
 
@@ -27,16 +27,18 @@ def test(solution_name, proposed_solution, tests)
 end
 
 start_time = Time.now
-max_lines = 4
+max_lines = 10
 
-ProveArithmetic.proofs.each do |p|
-  tests = ProveArithmetic.send(p)
-  digits = [nil, Arithmetic.methods - Module.methods].flatten
+Proofs::Arithmetic.proofs.each do |p|
+  tests = Proofs::Arithmetic.send(p)
+  digits = [nil, Templates::Arithmetic.methods - Module.methods].flatten
   max = (digits.length**max_lines) - 1
 
+  solution_count = 0
   (0..max).each do |i|
     solution = DigitArray.convert(i, digits, max_lines).compact
-    test(p.to_s.sub('prove_', ''), solution, tests)
+    solution_count += 1 if test(p.to_s.sub('prove_', ''), solution, tests)
+    break if solution_count >= 100
   end
 end
 
