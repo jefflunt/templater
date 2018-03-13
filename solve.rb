@@ -4,12 +4,16 @@ require './digit_array'
 Dir.glob('./templates/**.rb') {|f| require f}
 Dir.glob('./proofs/**.rb') {|f| require f}
 
+def method_compose(solution_name, proposed_solution)
+  "def __#{solution_name}(a, b)\n" +
+  proposed_solution.
+    collect{|t| "  #{Templates::Arithmetic.send(t)}" }.
+    join("\n") +
+  "\nend"
+end
+
 def test(solution_name, proposed_solution, tests)
-  method = "def __#{solution_name}(a, b)\n" + 
-           proposed_solution.
-             collect{|t| "  #{Templates::Arithmetic.send(t)}" }.
-             join("\n") +
-           "\nend"
+  method = method_compose(solution_name, proposed_solution)
 
   eval(method)
 
