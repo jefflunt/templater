@@ -1,13 +1,24 @@
 require 'pp'
 require './digit_array'
 
-Dir.glob('./templates/**.rb') {|f| require f}
+Dir.glob('./snippets/**.rb') {|f| require f}
 Dir.glob('./proofs/**.rb') {|f| require f}
 
+def all_templates
+  Templates.constants.collect do |tt|
+    template_set = Templates.const_get(tt)
+    (template_set.methods - Module.methods).collect do |t|
+      [template_set, t]
+    end
+  end
+end
+
 def method_compose(solution_name, proposed_solution)
+  puts solution_name
+  puts proposed_solution.inspect
   "def __#{solution_name}(a, b)\n" +
   proposed_solution.
-    collect{|t| "  #{Templates::Arithmetic.send(t)}" }.
+    collect{|t, m| "  #{Templates.const_get(t).send(m)}" }.
     join("\n") +
   "\nend"
 end
@@ -36,8 +47,8 @@ max_lines = 10
 
 Proofs.constants.each do |c|
   Proofs.const_get(c).proofs.each do |p|
-    tests = Proofs::Arithmetic.send(p)
-    digits = [nil, Templates::Arithmetic.methods - Module.methods].flatten
+    tests = c.send(p)
+    digits = [nil, all_templates].flatten
     max = (digits.length**max_lines) - 1
 
     solution_count = 0

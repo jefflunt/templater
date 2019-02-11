@@ -1,7 +1,7 @@
 module Proofs
   module Arithmetic
     def self.proofs
-      (methods - Module.methods).select{|m| m.to_s.start_with?('prove_') }
+      methods - Module.methods - [:proofs]
     end
 
     def self.prove_addition
