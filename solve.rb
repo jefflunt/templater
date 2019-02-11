@@ -1,7 +1,7 @@
 require 'pp'
 require './digit_array'
 
-Dir.glob('./snippets/**.rb') {|f| require f}
+Dir.glob('./templates/**.rb') {|f| require f}
 Dir.glob('./proofs/**.rb') {|f| require f}
 
 def all_templates
@@ -18,7 +18,7 @@ def method_compose(solution_name, proposed_solution)
   puts proposed_solution.inspect
   "def __#{solution_name}(a, b)\n" +
   proposed_solution.
-    collect{|t, m| "  #{Templates.const_get(t).send(m)}" }.
+    collect{|t| "  #{Templates::Arithmetic.send(t)}" }.
     join("\n") +
   "\nend"
 end
@@ -31,7 +31,10 @@ def test(solution_name, proposed_solution, tests)
   perfection = true
   tests.each_slice(2) do |args, output|
     begin
-      perfection = false unless send("__#{solution_name}".to_sym, *args) == output
+      unless send("__#{solution_name}".to_sym, *args) == output
+        perfection = false
+        break
+      end
     rescue => e
       perfection = output == e.class
     end
@@ -47,8 +50,8 @@ max_lines = 10
 
 Proofs.constants.each do |c|
   Proofs.const_get(c).proofs.each do |p|
-    tests = c.send(p)
-    digits = [nil, all_templates].flatten
+    tests = Proofs::Arithmetic.send(p)
+    digits = [nil, Templates::Arithmetic.methods - Module.methods].flatten
     max = (digits.length**max_lines) - 1
 
     solution_count = 0
