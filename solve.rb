@@ -14,8 +14,8 @@ def all_templates
 end
 
 def method_compose(solution_name, proposed_solution)
-  puts solution_name
-  puts proposed_solution.inspect
+#  puts solution_name
+#  puts proposed_solution.inspect
   "def __#{solution_name}(a, b)\n" +
   proposed_solution.
     collect{|t| "  #{Templates::Arithmetic.send(t)}" }.
